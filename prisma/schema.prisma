@@ -1,0 +1,189 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// User model for donors and hospitals
+model User {
+  id        String   @id @default(cuid()) @map("_id")
+  email     String   @unique
+  password  String
+  role      Role     @default(DONOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  donorProfile    DonorProfile?
+  hospitalProfile HospitalProfile?
+
+  @@map("users")
+}
+
+// Role enum
+enum Role {
+  DONOR
+  HOSPITAL
+}
+
+// Donor profile
+model DonorProfile {
+  id          String   @id @default(cuid()) @map("_id")
+  userId      String   @unique
+  firstName   String
+  lastName    String
+  dateOfBirth DateTime
+  bloodType   BloodType
+  phone       String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  emergencyContact String
+  medicalHistory String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  donations Donation[]
+  matches   Match[]
+
+  @@map("donor_profiles")
+}
+
+// Hospital profile
+model HospitalProfile {
+  id          String   @id @default(cuid()) @map("_id")
+  userId      String   @unique
+  name        String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  phone       String
+  email       String
+  licenseNumber String  @unique
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  requests BloodRequest[]
+
+  @@map("hospital_profiles")
+}
+
+// Blood types
+enum BloodType {
+  A_POSITIVE
+  A_NEGATIVE
+  B_POSITIVE
+  B_NEGATIVE
+  AB_POSITIVE
+  AB_NEGATIVE
+  O_POSITIVE
+  O_NEGATIVE
+}
+
+// Donation record
+model Donation {
+  id            String   @id @default(cuid()) @map("_id")
+  donorId       String
+  bloodType     BloodType
+  quantity      Float    // in ml
+  donationDate  DateTime
+  location      String
+  status        DonationStatus @default(COMPLETED)
+  notes         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  donor DonorProfile @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  @@map("donations")
+}
+
+// Donation status
+enum DonationStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  DEFERRED
+}
+
+// Blood request from hospitals
+model BloodRequest {
+  id          String   @id @default(cuid()) @map("_id")
+  hospitalId  String
+  bloodType   BloodType
+  quantity    Float    // in ml
+  urgency     Urgency
+  reason      String
+  status      RequestStatus @default(PENDING)
+  deadline    DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  hospital HospitalProfile @relation(fields: [hospitalId], references: [id], onDelete: Cascade)
+  matches   Match[]
+
+  @@map("blood_requests")
+}
+
+// Urgency levels
+enum Urgency {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+// Request status
+enum RequestStatus {
+  PENDING
+  MATCHED
+  FULFILLED
+  CANCELLED
+  EXPIRED
+}
+
+// Match between donor and request (AI-powered)
+model Match {
+  id         String   @id @default(cuid()) @map("_id")
+  requestId  String
+  donorId    String
+  score      Float    // AI matching score (0-100)
+  status     MatchStatus @default(PENDING)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  request BloodRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  donor   DonorProfile @relation(fields: [donorId], references: [id], onDelete: Cascade)
+
+  @@unique([requestId, donorId])
+  @@map("matches")
+}
+
+// Match status
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+}
