@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+
 type FormData = {
   name: string;
   age: number;
@@ -25,14 +26,58 @@ const DonorRegistration: React.FC = () => {
   const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<FormData>();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const onSubmit = (data: FormData) => {
-    console.log('Donor registration data:', data);
-    toast.success('🎉 Registration successful! Redirecting to dashboard...');
-    reset();
-    navigate('/dashboard');
+
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    try {
+      // Prepare data for backend
+      const donorData = {
+        name: data.name,
+        age: data.age,
+        gender: data.gender,
+        bloodGroup: data.bloodGroup,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        medicalConditions: data.medicalConditions || 'None',
+        donationHistory: data.donationHistory || 'First time',
+        status: 'pending'
+      };
+
+      console.log('Sending donor data to backend:', donorData);
+
+      // Send to backend API
+      const response = await fetch('http://localhost:5000/api/donors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(donorData),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Backend response:', result);
+
+      toast.success('🎉 Registration successful! Your data has been saved to the database.');
+      reset();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('❌ Registration failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
 
   const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   const states = [
@@ -287,11 +332,22 @@ const DonorRegistration: React.FC = () => {
 
             <button
               type="submit"
-              className="w-full bg-lemon-500 hover:bg-lemon-600 text-teal-900 font-bold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+              disabled={isSubmitting}
+              className="w-full bg-lemon-500 hover:bg-lemon-600 disabled:bg-gray-400 text-teal-900 font-bold py-4 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
             >
-              <Heart className="h-5 w-5" />
-              <span>Register as Donor</span>
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-900"></div>
+                  <span>Registering...</span>
+                </>
+              ) : (
+                <>
+                  <Heart className="h-5 w-5" />
+                  <span>Register as Donor</span>
+                </>
+              )}
             </button>
+
           </form>
         </div>
       </div>
