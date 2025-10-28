@@ -52,7 +52,8 @@ const DonorRegistration: React.FC = () => {
       console.log('Sending donor data to backend:', donorData);
 
       // Send to backend API
-      const response = await fetch('http://localhost:5000/api/donors', {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/donors`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

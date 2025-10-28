@@ -36,3 +36,17 @@ yarn-error.log*
 next-env.d.ts
 
 /lib/generated/prisma
+
+# MongoDB data
+/data/db/
+
+# Frontend build
+frontend/dist
+frontend/.vite
+
+# Backend
+backend/node_modules
+
+# Logs
+*.log
+/tmp/

@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -61,6 +60,29 @@ model DonorProfile {
   matches   Match[]
 
   @@map("donor_profiles")
+}
+
+// Simplified Donor model for direct registration
+model Donor {
+  id                String   @id @default(cuid())
+  name              String
+  age               Int
+  gender            String
+  bloodGroup        String
+  email             String
+  phone             String
+  password          String?
+  address           String
+  city              String
+  state             String
+  medicalConditions String?
+  donationHistory   String?
+  location          String?
+  status            String   @default("active")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("donors")
 }
 
 // Hospital profile
