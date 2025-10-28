@@ -24,6 +24,9 @@ const Navbar = () => {
             <Link to="/about" className="text-teal-700 hover:text-teal-900 transition-colors">
               About
             </Link>
+            <Link to="/donors" className="text-teal-700 hover:text-teal-900 transition-colors">
+              Donors
+            </Link>
             <Link to="/hospitals" className="text-teal-700 hover:text-teal-900 transition-colors">
               Hospitals
             </Link>
@@ -35,7 +38,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/register"
-              className="bg-lemon-500 hover:bg-lemon-600 text-teal-900 px-4 py-2 rounded-lg font-semibold transition-colors"
+              className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
             >
               Become a Donor
             </Link>
@@ -71,6 +74,13 @@ const Navbar = () => {
                 About
               </Link>
               <Link
+                to="/donors"
+                className="block px-3 py-2 text-teal-700 hover:text-teal-900"
+                onClick={() => setIsOpen(false)}
+              >
+                Donors
+              </Link>
+              <Link
                 to="/hospitals"
                 className="block px-3 py-2 text-teal-700 hover:text-teal-900"
                 onClick={() => setIsOpen(false)}
@@ -93,7 +103,7 @@ const Navbar = () => {
               </Link>
               <Link
                 to="/register"
-                className="block px-3 py-2 bg-lemon-500 hover:bg-lemon-600 text-teal-900 rounded-lg font-semibold"
+                className="block px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold"
                 onClick={() => setIsOpen(false)}
               >
                 Become a Donor

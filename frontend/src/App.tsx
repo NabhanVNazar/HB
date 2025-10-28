@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import LandingPage from './pages/LandingPage';
 import DonorRegistration from './pages/DonorRegistration';
 import HospitalDashboard from './pages/HospitalDashboard';
+import DonorsList from './pages/DonorsList';
 
 // Components
 import Navbar from './components/Navbar';
@@ -23,6 +24,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/hospitals" element={<Hospitals />} />
+          <Route path="/donors" element={<DonorsList />} />
           <Route path="/home" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<DonorRegistration />} />
